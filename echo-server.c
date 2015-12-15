@@ -42,14 +42,14 @@ main(int argc, char **argv)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE; // use my IP
 
-    /* step 1: perform getaddrinfo to fill socket data structure*/
+    // step 1: perform getaddrinfo to fill socket data structure
     struct addrinfo *servinfo;
     assert(getaddrinfo(NULL, "8888", &hints, &servinfo) == 0);
 
     // loop through all the results and bind to the first we can
     int sockfd = -1;
     for(struct addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
-	//create socket file descriptor    
+	//step 2: create socket file descriptor    
         if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
             continue;
         }
@@ -58,7 +58,7 @@ main(int argc, char **argv)
     	int yes=1;
         assert(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == 0);
 
-	//bind sockfd to the specified address & port
+	//step 3: bind sockfd to the specified address & port
         assert(bind(sockfd, p->ai_addr, p->ai_addrlen) == 0);
 
         break;
@@ -68,11 +68,12 @@ main(int argc, char **argv)
 
     assert(sockfd >= 0);
 
-    //mark sockfd as allowing for incoming connections, with a wait queue size of 10
+    //step 4: mark sockfd as allowing for incoming connections, with a wait queue size of 10
     assert(listen(sockfd, 10) == 0);
 
     printf("echo server: waiting for connections...\n");
 
+    //step 5: do the accept loop
     while(1) {  
     	struct sockaddr_in remote_addr; // connector's address information
         socklen_t sin_size = sizeof(remote_addr);

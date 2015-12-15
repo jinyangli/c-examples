@@ -30,19 +30,19 @@ main(int argc, char **argv)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE; // use my IP
 
-    /* step 1: perform getaddrinfo to fill socket data structure*/
+    // step 1: perform getaddrinfo to fill socket data structure
     struct addrinfo *servinfo;
     assert(getaddrinfo(argv[1], "8888", &hints, &servinfo) == 0);
 
     // loop through all the results and bind to the first we can
     int conn_fd = -1;
     for(struct addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
-	//create socket file descriptor    
+	//step 2: create socket file descriptor    
         if ((conn_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
             continue;
         }
 
-	//connect to server
+	//step 3: connect to server
         assert(connect(conn_fd, p->ai_addr, p->ai_addrlen) == 0);
         break;
     }
